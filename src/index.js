@@ -82,6 +82,7 @@ export const createRestHook = (endpoint, createHookOptions = {}) => (...args) =>
 
   // extract options
   let {
+    appendSlash = false,
     autoload = true,
     axios = fetchAxios,
     fetchOptions = {},
@@ -327,15 +328,19 @@ export const createRestHook = (endpoint, createHookOptions = {}) => (...args) =>
 
       return item
     }
+    var thisEndpoint = getEndpoint(endpoint, itemId)
+    if (appendSlash && thisEndpoint !== '') {
+      thisEndpoint += '/'
+    }
 
-    log(`calling "${method}" to`, getEndpoint(endpoint, itemId), payload)
+    log(`calling "${method}" to`, thisEndpoint, payload)
 
     // mock exit for success
     if (mock) {
       return autoResolve('Success!', { fn: resolve })
     }
 
-    return axios[method](getEndpoint(endpoint, itemId), payload, fetchOptions)
+    return axios[method](thisEndpoint, payload, fetchOptions)
       .then(resolve)
       .catch(err => handleError(err.response || err))
   }
